@@ -14,5 +14,9 @@ fn main() {
     if confirmation == false {
         println!("Exiting program");
         std::process::exit(0)
-    } 
+    }
+
+    // Get files in current directory
+    let files = files::get_filepaths_in_cwd().expect("Files could not be parsed");
+    println!("Found {} files in current directory", &files.len());
 }
