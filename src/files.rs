@@ -1,4 +1,4 @@
-use std::{collections::btree_map::Entry, fs::{self, File}, io::{BufReader, Error, Read, Write}};
+use std::{fs::{self, File}, io::{BufReader, Error, Read, Write}};
 
 pub fn get_filepaths_in_cwd() -> Result<Vec<String>, Error> {
     // Create empty vector
