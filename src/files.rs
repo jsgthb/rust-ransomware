@@ -1,23 +1,17 @@
-use std::{fs::{self, File}, io::{BufReader, Error, Read, Write}};
+use std::{collections::btree_map::Entry, fs::{self, File}, io::{BufReader, Error, Read, Write}};
 
 pub fn get_filepaths_in_cwd() -> Result<Vec<String>, Error> {
     // Create empty vector
     let mut directories: Vec<String> = Vec::new();
     // Read files in current directory
-    match fs::read_dir("./") {
-        Ok(entries) => {
-            for entry in entries {
-                match entry {
-                    Ok(entry) => {
-                        // Add path to string vector
-                        directories.push(entry.path().into_os_string().into_string().expect("Path string conversion failed"))
-                    }
-                    Err(e) => return Err(e)
-                }
-            }
+    let dir = fs::read_dir("./").expect("Failed to read directory");
+       
+    for entry in dir {
+        let path = entry.expect("Could not read path").path();
+        if path.is_file() {
+            directories.push(path.into_os_string().into_string().expect("Could not convert PathBuf to String"))
         }
-        Err(e) => return Err(e)
-    }
+    }      
     return Ok(directories);
 }
 
