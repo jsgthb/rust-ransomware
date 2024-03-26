@@ -1,4 +1,4 @@
-use std::{fs, io::Error};
+use std::{fs::{self, File}, io::{BufReader, Error, Read}};
 
 pub fn get_filepaths_in_cwd() -> Result<Vec<String>, Error> {
     // Create empty vector
@@ -19,4 +19,16 @@ pub fn get_filepaths_in_cwd() -> Result<Vec<String>, Error> {
         Err(e) => return Err(e)
     }
     return Ok(directories);
+}
+
+pub fn read_file_bytes(filepath: &str) -> Result<Vec<u8>, Error> {
+    let file = File::open(filepath)?;
+    let mut reader = BufReader::new(file);
+    let mut buffer = Vec::new();
+
+    // Read file
+    match reader.read_to_end(&mut buffer) {
+        Ok(_) => return Ok(buffer),
+        Err(e) => Err(e),
+    }
 }
