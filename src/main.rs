@@ -1,6 +1,7 @@
 use inquire::Confirm;
 
 mod files;
+mod encrypt;
 
 fn main() {
     // Get confirmation from user
