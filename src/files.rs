@@ -1,4 +1,4 @@
-use std::{fs::{self, File}, io::{BufReader, Error, Read}};
+use std::{fs::{self, File}, io::{BufReader, Error, Read, Write}};
 
 pub fn get_filepaths_in_cwd() -> Result<Vec<String>, Error> {
     // Create empty vector
@@ -29,6 +29,18 @@ pub fn read_file_bytes(filepath: &str) -> Result<Vec<u8>, Error> {
     // Read file
     match reader.read_to_end(&mut buffer) {
         Ok(_) => return Ok(buffer),
+        Err(e) => Err(e),
+    }
+}
+
+pub fn save_file_bytes(filepath: &str, file_data: Vec<u8>) -> Result<(), Error> {
+    let encrypted_filepath = format!("{}.enc", filepath);
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .open(encrypted_filepath)?;
+
+    match file.write_all(&file_data) {
+        Ok(_) => Ok(()),
         Err(e) => Err(e),
     }
 }
