@@ -1,5 +1,7 @@
 use inquire::Confirm;
 
+use crate::{encrypt::encrypt_file, files::save_file_bytes};
+
 mod files;
 mod encrypt;
 
@@ -20,4 +22,17 @@ fn main() {
     // Get files in current directory
     let files = files::get_filepaths_in_cwd().expect("Files could not be parsed");
     println!("Found {} files in current directory", &files.len());
+
+    // Loop through files and encrypt them
+    for file in files {
+        let ciphertext = encrypt_file(&file).expect("Encryption failed");
+        match save_file_bytes(&file, ciphertext) {
+            Ok(_) => {
+                println!("Encrypted file {}", &file)
+            },
+            Err(e) => {
+                println!("Error encrypting file {} ({})", &file, e)
+            }
+        }
+    }
 }
