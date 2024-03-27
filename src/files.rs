@@ -27,3 +27,8 @@ pub fn save_file_bytes(filepath: &str, file_data: Vec<u8>) -> Result<(), Error> 
     file.write_all(&file_data)?;
     Ok(())
 }
+
+pub fn delete_file(filepath: &str) -> Result<(), Error> {
+    fs::remove_file(filepath)?;
+    Ok(())
+}
