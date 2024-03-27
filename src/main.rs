@@ -1,4 +1,4 @@
-use inquire::Confirm;
+use inquire::{Confirm, InquireError, Select};
 
 use crate::{encrypt::{encrypt_file, generate_encryption_key}, files::save_file_bytes};
 
@@ -6,6 +6,22 @@ mod files;
 mod encrypt;
 
 fn main() {
+    // Select encryption ot decryption
+    let options: Vec<&str> = vec!["Encrypt", "Decrypt"];
+    let answer: Result<&str, InquireError> = Select::new("Encrypt or decrypt files?", options).prompt();
+    match answer {
+        Ok(choice) => {
+            if choice == "Encrypt" {
+                encrypt_files()
+            } else {
+                decrypt_files()
+            }
+        }
+        Err(_) => println!("Error with questionaire"),
+    }
+}
+
+fn encrypt_files() {
     // Get confirmation from user
     let confirmation = Confirm::new("Are you sure you want to encrypt the files in the current directory?")
         .with_default(false)
@@ -39,4 +55,8 @@ fn main() {
             }
         }
     }
+}
+
+fn decrypt_files() {
+    todo!()
 }
