@@ -1,7 +1,6 @@
 use inquire::{Confirm, InquireError, Select};
 use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
-use crate::{encrypt::{encrypt_file, generate_encryption_key}, files::save_file_bytes};
 
 mod files;
 mod encrypt;
@@ -46,16 +45,20 @@ fn encrypt_files() {
         .take(10)
         .map(char::from)
         .collect();
-    let encryption_key = generate_encryption_key(&password).expect("Could not generate encryption key");
-    save_file_bytes("password.txt", password.as_bytes().to_vec()).expect("Saving password file failed");
+    let encryption_key = encrypt::generate_encryption_key(&password).expect("Could not generate encryption key");
+    files::save_file_bytes("password.txt", password.as_bytes().to_vec()).expect("Saving password file failed");
 
     // Loop through files and encrypt them
     for file in files {
-        let ciphertext = encrypt_file(&file, encryption_key).expect("Encryption failed");
+        let ciphertext = encrypt::encrypt_file(&file, encryption_key).expect("Encryption failed");
         let encrypted_filepath = format!("{}.enc", file);
-        match save_file_bytes(&encrypted_filepath, ciphertext) {
+        match files::save_file_bytes(&encrypted_filepath, ciphertext) {
             Ok(_) => {
-                println!("Encrypted file {}", &file)
+                println!("Encrypted file {}", &file);
+                match files::delete_file(&file) {
+                    Ok(_) => println!("Deleted original file"),
+                    Err(e) => println!("Could not delete original file ({})", e),
+                }
             },
             Err(e) => {
                 println!("Error encrypting file {} ({})", &file, e)
