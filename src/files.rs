@@ -23,8 +23,7 @@ pub fn read_file_bytes(filepath: &str) -> Result<Vec<u8>, Error> {
 }
 
 pub fn save_file_bytes(filepath: &str, file_data: Vec<u8>) -> Result<(), Error> {
-    let encrypted_filepath = format!("{}.enc", filepath);
-    let mut file = File::create(encrypted_filepath)?;
+    let mut file = File::create(filepath)?;
     file.write_all(&file_data)?;
     Ok(())
 }

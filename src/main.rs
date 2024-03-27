@@ -1,5 +1,6 @@
 use inquire::{Confirm, InquireError, Select};
-
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
 use crate::{encrypt::{encrypt_file, generate_encryption_key}, files::save_file_bytes};
 
 mod files;
@@ -39,14 +40,20 @@ fn encrypt_files() {
     let files = files::get_filepaths_in_cwd().expect("Files could not be parsed");
     println!("Found {} files in current directory", &files.len());
 
-    // Generate encryption key
-    let password = "asecurepassword";
-    let encryption_key = generate_encryption_key(password).expect("Could not generate encryption key");
+    // Generate random password for encryption key
+    let password: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(10)
+        .map(char::from)
+        .collect();
+    let encryption_key = generate_encryption_key(&password).expect("Could not generate encryption key");
+    save_file_bytes("password.txt", password.as_bytes().to_vec()).expect("Saving password file failed");
 
     // Loop through files and encrypt them
     for file in files {
         let ciphertext = encrypt_file(&file, encryption_key).expect("Encryption failed");
-        match save_file_bytes(&file, ciphertext) {
+        let encrypted_filepath = format!("{}.enc", file);
+        match save_file_bytes(&encrypted_filepath, ciphertext) {
             Ok(_) => {
                 println!("Encrypted file {}", &file)
             },
