@@ -1,3 +1,5 @@
+use std::env;
+
 use inquire::{Confirm, InquireError, Select};
 use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
@@ -50,6 +52,15 @@ fn encrypt_files() {
 
     // Loop through files and encrypt them
     for file in files {
+        // Skip iteration if file is current executable
+        let current_exe = env::current_exe().expect("Could not get current exe path");
+        let exe_filename = current_exe.file_name().expect("Could not get filename");
+        if exe_filename.to_str() == Some(file.as_str()) {
+            println!("Skipping executable");
+            continue;
+        }
+        
+        // Encrypt file
         let ciphertext = encrypt::encrypt_file(&file, encryption_key).expect("Encryption failed");
         let encrypted_filepath = format!("{}.enc", file);
         match files::save_file_bytes(&encrypted_filepath, ciphertext) {
