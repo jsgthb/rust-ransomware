@@ -22,7 +22,7 @@ pub fn read_file_bytes(filepath: &str) -> Result<Vec<u8>, Error> {
     Ok(file_bytes)
 }
 
-pub fn save_file_bytes(filepath: &str, file_data: Vec<u8>) -> Result<(), Error> {
+pub fn save_file_bytes(filepath: &str, file_data: &[u8]) -> Result<(), Error> {
     let mut file = File::create(filepath)?;
     file.write_all(&file_data)?;
     Ok(())

@@ -50,7 +50,7 @@ fn encrypt_files() {
     let salt = encrypt::generate_salt();
     let encryption_key = encrypt::generate_encryption_key(&password, &salt).expect("Could not generate encryption key");
     let salt_and_password = format!("{} {}", password, salt);
-    files::save_file_bytes("password.txt", salt_and_password.as_bytes().to_vec()).expect("Saving password file failed");
+    files::save_file_bytes("password.txt", salt_and_password.as_bytes()).expect("Saving password file failed");
     // Remove password and salt from memory
     drop(password);
     drop(salt);
@@ -69,7 +69,7 @@ fn encrypt_files() {
         // Encrypt file
         let ciphertext = encrypt::encrypt_file(&file, encryption_key).expect("Encryption failed");
         let encrypted_filepath = format!("{}.enc", file);
-        match files::save_file_bytes(&encrypted_filepath, ciphertext) {
+        match files::save_file_bytes(&encrypted_filepath, &ciphertext) {
             Ok(_) => {
                 println!("Encrypted file {}", &file);
                 match files::delete_file(&file) {
