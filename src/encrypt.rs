@@ -6,10 +6,14 @@ use argon2::{password_hash::SaltString, Argon2};
 
 use crate::files::read_file_bytes;
 
-pub fn generate_encryption_key(password: &str) -> Result<[u8; 32], argon2::Error> {
+pub fn generate_salt() -> String {
+    let salt = SaltString::generate(&mut OsRng).as_str().to_string();
+    return salt;
+}
+
+pub fn generate_encryption_key(password: &str, salt: &str) -> Result<[u8; 32], argon2::Error> {
     let mut key_buffer = [0u8; 32];
-    let salt = SaltString::generate(&mut OsRng);
-    match Argon2::default().hash_password_into(password.as_bytes(), salt.as_str().as_bytes(), &mut key_buffer) {
+    match Argon2::default().hash_password_into(password.as_bytes(), salt.as_bytes(), &mut key_buffer) {
         Ok(_) => return Ok(key_buffer),
         Err(err) => return Err(err),
     }

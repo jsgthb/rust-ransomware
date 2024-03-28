@@ -47,8 +47,14 @@ fn encrypt_files() {
         .take(10)
         .map(char::from)
         .collect();
-    let encryption_key = encrypt::generate_encryption_key(&password).expect("Could not generate encryption key");
-    files::save_file_bytes("password.txt", password.as_bytes().to_vec()).expect("Saving password file failed");
+    let salt = encrypt::generate_salt();
+    let encryption_key = encrypt::generate_encryption_key(&password, &salt).expect("Could not generate encryption key");
+    let salt_and_password = format!("{} {}", password, salt);
+    files::save_file_bytes("password.txt", salt_and_password.as_bytes().to_vec()).expect("Saving password file failed");
+    // Remove password and salt from memory
+    drop(password);
+    drop(salt);
+    drop(salt_and_password);
 
     // Loop through files and encrypt them
     for file in files {
