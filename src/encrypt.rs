@@ -30,7 +30,10 @@ pub fn encrypt_file(filepath: &str, hashed_password: [u8; 32]) -> Result<Vec<u8>
     let cipher = Aes256Gcm::new(encryption_key);
     let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
     match cipher.encrypt(&nonce, file_data.as_ref()) {
-        Ok(ciphertext) => return Ok(ciphertext),
+        Ok(mut ciphertext) => {
+            ciphertext.append(&mut nonce.to_vec());
+            return Ok(ciphertext)
+        },
         Err(e) => Err(e),
     }
 }
