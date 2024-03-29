@@ -1,6 +1,6 @@
 use aes_gcm::{
     aead::{Aead, AeadCore, KeyInit, OsRng},
-    Aes256Gcm, Key
+    Aes256Gcm, Key, Nonce
 };
 use argon2::{password_hash::SaltString, Argon2};
 
@@ -34,6 +34,22 @@ pub fn encrypt_file(filepath: &str, hashed_password: [u8; 32]) -> Result<Vec<u8>
             ciphertext.append(&mut nonce.to_vec());
             return Ok(ciphertext)
         },
+        Err(e) => Err(e),
+    }
+}
+
+pub fn decrypt_file(filepath: &str, hashed_password: [u8; 32]) -> Result<Vec<u8>, aes_gcm::Error> {
+    // Read file data
+    let mut file_data = read_file_bytes(filepath).expect("Could not read file");
+    // Get 12 byte nonce from file
+    let file_length = file_data.len().saturating_sub(12);
+    let nonce_bytes = file_data.split_off(file_length);
+    let nonce = Nonce::from_slice(&nonce_bytes);
+    // Decrypt file
+    let encryption_key = Key::<Aes256Gcm>::from_slice(&hashed_password);
+    let cipher = Aes256Gcm::new(&encryption_key);
+    match cipher.decrypt(nonce, file_data.as_ref()) {
+        Ok(plaintext) => { return Ok(plaintext)},
         Err(e) => Err(e),
     }
 }

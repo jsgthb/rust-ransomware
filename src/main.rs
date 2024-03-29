@@ -105,10 +105,26 @@ fn decrypt_files() {
         };
         if file_extension == ".enc" {
             println!("Encrypted file found")
+        } else {
+            continue
         }
 
         // Decrypt file
-        let file_bytes = files::read_file_bytes(&file).expect("Could not read file");
-        todo!()
+        let plaintext = encrypt::decrypt_file(&file, encryption_key).expect("Decryption failed");
+        let filename_length = file.len().saturating_sub(4);
+        let mut filename_plaintext = file.clone();
+        filename_plaintext.truncate(filename_length);
+        match files::save_file_bytes(&filename_plaintext, &plaintext) {
+            Ok(_) => {
+                println!("Decrypted file {}", &file);
+                match files::delete_file(&file) {
+                    Ok(_) => (),
+                    Err(e) => println!("Could not delete encrypted file ({})", e),
+                }
+            },
+            Err(e) => {
+                println!("Error saving decrypted file {} ({})", &file, e)
+            }
+        }
     }
 }
