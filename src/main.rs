@@ -1,6 +1,6 @@
 use std::env;
 
-use inquire::{Confirm, InquireError, Select};
+use inquire::{Confirm, InquireError, Select, Text};
 use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
 
@@ -85,5 +85,30 @@ fn encrypt_files() {
 }
 
 fn decrypt_files() {
-    todo!()
+    // Get password and salt to generate key
+    let password = Text::new("Enter plaintext password").prompt().expect("Error with questionaire");
+    let salt = Text::new("Enter salt").prompt().expect("Error with questionaire");
+    let encryption_key = encrypt::generate_encryption_key(&password, &salt).expect("Could not generate encryption key");
+
+    let files = files::get_filepaths_in_cwd().expect("Files could not be parsed");
+    println!("Found {} files in current directory", &files.len());
+    for file in files {
+        // Check if file is larger than single character with file extension
+        if file.len() < 5 {
+            continue;
+        }
+
+        // Check if file is encrypted
+        let file_extension = {
+            let split_pos = file.char_indices().nth_back(3).expect("Could not get file extension").0;
+            &file[split_pos..]
+        };
+        if file_extension == ".enc" {
+            println!("Encrypted file found")
+        }
+
+        // Decrypt file
+        let file_bytes = files::read_file_bytes(&file).expect("Could not read file");
+        todo!()
+    }
 }
