@@ -10,3 +10,9 @@ inquire = "0.7.4"
 aes-gcm = "0.10.3"
 argon2 = "0.5.3"
 rand = "0.8.5"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+lto = true
+codegen-units = 1
+panic = "abort"
