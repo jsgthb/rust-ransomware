@@ -1,5 +1,6 @@
 use std::env;
 
+use inquire::validator::MinLengthValidator;
 use inquire::{Confirm, InquireError, Select, Text};
 use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
@@ -87,7 +88,7 @@ fn encrypt_files() {
 fn decrypt_files() {
     // Get password and salt to generate key
     let password = Text::new("Enter plaintext password").prompt().expect("Error with questionaire");
-    let salt = Text::new("Enter salt").prompt().expect("Error with questionaire");
+    let salt = Text::new("Enter salt").with_validator(MinLengthValidator::new(32)).prompt().expect("Error with questionaire");
     let encryption_key = encrypt::generate_encryption_key(&password, &salt).expect("Could not generate encryption key");
 
     let files = files::get_filepaths_in_cwd().expect("Files could not be parsed");
