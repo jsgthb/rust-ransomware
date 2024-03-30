@@ -96,6 +96,7 @@ fn decrypt_files() {
     for file in files {
         // Check if file is larger than single character with file extension
         if file.len() < 5 {
+            println!("Skipping file {}", file);
             continue;
         }
 
@@ -107,6 +108,7 @@ fn decrypt_files() {
         if file_extension == ".enc" {
             println!("Encrypted file found")
         } else {
+            println!("Skipping file {}", file);
             continue
         }
 
